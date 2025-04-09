@@ -1,6 +1,7 @@
 import torch
 from torchvision import models, transforms
 from PIL import Image
+import torch.nn.functional as F  # Import for softmax
 import os
 
 class InferenceController:
@@ -52,10 +53,17 @@ class InferenceController:
 
     def predict(self, image_path):
         """
-        Runs inference on an image and returns the predicted class.
+        Runs inference on an image and returns detailed prediction information.
         """
         image_tensor = self.transform_image(image_path)
         with torch.no_grad():
-            output = self.model(image_tensor)
-        prediction = torch.argmax(output, dim=1).item()
-        return {"prediction": prediction}
+            output = self.model(image_tensor)  # Raw model outputs (logits)
+            probabilities = F.softmax(output, dim=1)  # Convert logits to probabilities
+            prediction = torch.argmax(output, dim=1).item()  # Predicted class index
+
+        # Return detailed information
+        return {
+            "logits": output.tolist(),  # Raw model outputs
+            "probabilities": probabilities.tolist(),  # Probabilities for each class
+            "prediction": prediction  # Predicted class index
+        }
