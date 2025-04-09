@@ -55,15 +55,31 @@ class InferenceController:
         """
         Runs inference on an image and returns detailed prediction information.
         """
+        # Define a mapping of class indices to names
+        class_names = {
+            0: "Ampolla",
+            1: "Mancha",
+            2: "Pústula",
+            3: "Roncha"
+        }
+
         image_tensor = self.transform_image(image_path)
         with torch.no_grad():
             output = self.model(image_tensor)  # Raw model outputs (logits)
-            probabilities = F.softmax(output, dim=1)  # Convert logits to probabilities
+            probabilities = F.softmax(output, dim=1).squeeze(0)  # Convert logits to probabilities and remove batch dimension
             prediction = torch.argmax(output, dim=1).item()  # Predicted class index
+
+        # Map the prediction index to the class name
+        prediction_name = class_names.get(prediction, "Unknown")
+
+        # Create a list of class names with their probabilities in percentages
+        probabilities_with_names = [
+            {"class": class_names[i], "probability": f"{prob.item() * 100:.2f}%"}
+            for i, prob in enumerate(probabilities)
+        ]
 
         # Return detailed information
         return {
-            "logits": output.tolist(),  # Raw model outputs
-            "probabilities": probabilities.tolist(),  # Probabilities for each class
-            "prediction": prediction  # Predicted class index
+            "probabilities": probabilities_with_names,  # Probabilities with class names in percentages
+            "prediction": prediction_name  # Predicted class name
         }
