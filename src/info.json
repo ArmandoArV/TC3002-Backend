@@ -1,0 +1,22 @@
+{
+    "Ampolla": {
+        "info_elemental": "La ampolla es una lesión primaria de la piel que se caracteriza por una elevación circunscrita llena de líquido claro, generalmente mayor de 5 mm de diámetro.",
+        "mas_informacion": "Las ampollas pueden ser causadas por quemaduras, fricción o infecciones.",
+        "url": "https://es.wikipedia.org/wiki/Ampolla"
+    },
+    "Mancha": {
+        "info_elemental": "La mancha es una lesión primaria de la piel que se presenta como un cambio de coloración sin alteración en la textura ni elevación.",
+        "mas_informacion": "Las manchas pueden ser causadas por hiperpigmentación, hipopigmentación o enfermedades subyacentes.",
+        "url": "https://es.wikipedia.org/wiki/Mancha_(medicina)"
+    },
+    "Pústula": {
+        "info_elemental": "La pústula es una lesión primaria de la piel que consiste en una pequeña elevación circunscrita llena de pus.",
+        "mas_informacion": "Las pústulas suelen estar asociadas con infecciones bacterianas o acné.",
+        "url": "https://es.wikipedia.org/wiki/P%C3%BAstula"
+    },
+    "Roncha": {
+        "info_elemental": "La roncha es una lesión primaria de la piel que se caracteriza por una elevación transitoria, de bordes definidos, generalmente acompañada de picazón.",
+        "mas_informacion": "Las ronchas suelen ser causadas por reacciones alérgicas o picaduras de insectos.",
+        "url": "https://es.wikipedia.org/wiki/Urticaria"
+    }
+}

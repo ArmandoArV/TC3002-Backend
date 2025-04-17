@@ -3,6 +3,7 @@ from torchvision import models, transforms
 from PIL import Image
 import torch.nn.functional as F  # Import for softmax
 import os
+import json
 
 
 class InferenceController:
@@ -72,6 +73,11 @@ class InferenceController:
         # Define a mapping of class indices to names
         class_names = {0: "Ampolla", 1: "Mancha", 2: "Pústula", 3: "Roncha"}
 
+        # Load the info.json file
+        info_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "info.json"))
+        with open(info_path, "r", encoding="utf-8") as f:
+            info_data = json.load(f)
+
         image_tensor = self.transform_image(image_path)
         with torch.no_grad():
             output = self.model(image_tensor)  # Raw model outputs (logits)
@@ -82,6 +88,9 @@ class InferenceController:
         prediction_name = class_names.get(prediction, "Unknown")
         prediction_percentage = f"{probabilities[prediction].item() * 100:.2f}%"  # Get the probability of the predicted class
 
+        # Retrieve additional information for the main prediction
+        prediction_info = info_data.get(prediction_name, {})
+
         # Include all predictions with their probabilities
         all_predictions = [
             {"class": class_names.get(idx, "Unknown"), "percentage": f"{prob.item() * 100:.2f}%"}
@@ -91,7 +100,13 @@ class InferenceController:
         # Return the desired JSON structure
         return {
             "real_prediction": [
-                {"percentage": prediction_percentage, "prediction": prediction_name}
+                {
+                    "percentage": prediction_percentage,
+                    "prediction": prediction_name,
+                    "info_elemental": prediction_info.get("info_elemental", ""),
+                    "mas_informacion": prediction_info.get("mas_informacion", ""),
+                    "url": prediction_info.get("url", "")
+                }
             ],
             "all_predictions": all_predictions
         }
