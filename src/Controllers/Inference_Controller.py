@@ -4,10 +4,11 @@ from PIL import Image
 import torch.nn.functional as F  # Import for softmax
 import os
 import json
+from pymongo import MongoClient  # Import MongoDB client
 
 
 class InferenceController:
-    def __init__(self, model_filename="vgg11_15_epochs_aug_RMS.pt", device=None):
+    def __init__(self, model_filename="vgg11_15_epochs_aug_RMS.pt", device=None, mongo_uri="mongodb://localhost:27017/", db_name="mydatabase"):
         """
         Initialize the inference controller.
         - Loads the model from the correct path.
@@ -18,6 +19,9 @@ class InferenceController:
         )
         self.model_path = self.get_model_path(model_filename)
         self.model = self.load_model(self.model_path)
+        # Initialize MongoDB connection
+        self.mongo_client = MongoClient(mongo_uri)
+        self.db = self.mongo_client[db_name]
 
     def get_model_path(self, model_filename):
         """
@@ -104,6 +108,7 @@ class InferenceController:
                     "percentage": prediction_percentage,
                     "prediction": prediction_name,
                     "info_elemental": prediction_info.get("info_elemental", ""),
+                    "caracteristicas_clave": prediction_info.get("caracteristicas_clave", ""),
                     "mas_informacion": prediction_info.get("mas_informacion", ""),
                     "url": prediction_info.get("url", "")
                 }
