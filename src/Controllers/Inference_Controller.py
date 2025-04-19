@@ -6,6 +6,7 @@ import os
 import json
 from pymongo import MongoClient  # Import MongoDB client
 from src.Database.mongo_connection import MongoConnection
+import unicodedata
 
 class InferenceController:
     def __init__(self, model_filename="vgg11_15_epochs_aug_RMS.pt", device=None):
@@ -25,13 +26,16 @@ class InferenceController:
         mongo_instance = MongoConnection.get_instance()
         self.db = mongo_instance.db
 
+    import unicodedata  # Import for normalizing Unicode characters
+
     def get_related_images(self, prediction_name):
         """
         Retrieves all related images from MongoDB based on the prediction name.
         Dynamically selects the collection based on the prediction.
         """
-        # Map prediction names to collection names
-        collection_name = f"{prediction_name.lower()}"
+        # Normalize the prediction name to remove accents
+        normalized_prediction_name = unicodedata.normalize('NFKD', prediction_name).encode('ASCII', 'ignore').decode('utf-8')
+        collection_name = f"{normalized_prediction_name.lower()}"
         print(f"Collection name: {collection_name}")
 
         # Check if the collection exists
