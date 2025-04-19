@@ -5,24 +5,51 @@ import torch.nn.functional as F  # Import for softmax
 import os
 import json
 from pymongo import MongoClient  # Import MongoDB client
-
+from src.Database.mongo_connection import MongoConnection
 
 class InferenceController:
-    def __init__(self, model_filename="vgg11_15_epochs_aug_RMS.pt", device=None, mongo_uri="mongodb://localhost:27017/", db_name="mydatabase"):
+    def __init__(self, model_filename="vgg11_15_epochs_aug_RMS.pt", device=None):
         """
         Initialize the inference controller.
         - Loads the model from the correct path.
         - Uses the available device (GPU or CPU).
+        - Reuses the MongoDB connection.
         """
         self.device = (
             device if device else ("cuda" if torch.cuda.is_available() else "cpu")
         )
         self.model_path = self.get_model_path(model_filename)
         self.model = self.load_model(self.model_path)
-        # Initialize MongoDB connection
-        self.mongo_client = MongoClient(mongo_uri)
-        self.db = self.mongo_client[db_name]
 
+        # Reuse the MongoDB connection
+        mongo_instance = MongoConnection.get_instance()
+        self.db = mongo_instance.db
+
+    def get_related_images(self, prediction_name):
+        """
+        Retrieves all related images from MongoDB based on the prediction name.
+        Dynamically selects the collection based on the prediction.
+        """
+        # Map prediction names to collection names
+        collection_name = f"{prediction_name.lower()}"
+        print(f"Collection name: {collection_name}")
+
+        # Check if the collection exists
+        if collection_name not in self.db.list_collection_names():
+            print(f"Collection '{collection_name}' does not exist.")
+            return []
+
+        # Access the collection dynamically
+        collection = self.db[collection_name]
+        print(f"Connected to MongoDB database: {self.db.name}")
+        print(f"Number of documents in collection '{collection_name}': {collection.count_documents({})}")
+
+        # Query the collection for all images
+        related_images = collection.find({}, {"_id": 0, "image": 1})
+        images = [doc["image"] for doc in related_images]
+        print(f"Retrieved images: {images}")
+
+        return images
     def get_model_path(self, model_filename):
         """
         Constructs the absolute path to the model file.
@@ -95,6 +122,9 @@ class InferenceController:
         # Retrieve additional information for the main prediction
         prediction_info = info_data.get(prediction_name, {})
 
+        # Retrieve all related images from MongoDB
+        related_images = self.get_related_images(prediction_name)
+
         # Include all predictions with their probabilities
         all_predictions = [
             {"class": class_names.get(idx, "Unknown"), "percentage": f"{prob.item() * 100:.2f}%"}
@@ -110,7 +140,8 @@ class InferenceController:
                     "info_elemental": prediction_info.get("info_elemental", ""),
                     "caracteristicas_clave": prediction_info.get("caracteristicas_clave", ""),
                     "mas_informacion": prediction_info.get("mas_informacion", ""),
-                    "url": prediction_info.get("url", "")
+                    "url": prediction_info.get("url", ""),
+                    "related_images": related_images  # Add all related images
                 }
             ],
             "all_predictions": all_predictions
