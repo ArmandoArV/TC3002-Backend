@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.10.11
+FROM python:3.12-alpine
 
 # Set the working directory in the container
 WORKDIR /app
@@ -16,10 +16,10 @@ COPY . /app/
 # Set environment variables for Flask
 ENV FLASK_APP=main.py
 ENV FLASK_RUN_HOST=0.0.0.0
-ENV FLASK_RUN_PORT=8000
+ENV FLASK_RUN_PORT=5000
 
 # Expose the port your application runs ons
-EXPOSE 8000
+EXPOSE 5000/tcp
 
 # Set the command to run your Flask application
-CMD [ "python", "./main.py" ]
+CMD [ "python", "main.py" ]
