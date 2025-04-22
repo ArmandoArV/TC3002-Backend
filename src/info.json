@@ -1,26 +1,26 @@
 {
     "Ampolla": {
-        "info_elemental": "La ampolla es una lesión primaria de la piel que se caracteriza por una elevación circunscrita llena de líquido claro, generalmente mayor de 5 mm de diámetro.",
-        "mas_informacion": "Las ampollas pueden ser causadas por quemaduras, fricción o infecciones.",
-        "url": "https://es.wikipedia.org/wiki/Ampolla",
-        "caracteristicas_clave": "Se caracteriza por una elevación circunscrita, llena de líquido claro y generalmente mayor de 5 mm de diámetro."
+        "info_elemental": "La ampolla es una lesión primaria de la piel que se caracteriza por una elevación circunscrita llena de líquido claro, generalmente mayor a 5 mm de diámetro. Se observan como sacos llenos de líquido en la capa externa de la piel. También se les conoce como vesícula (ampollas más pequeñas) y bula (ampollas más grandes).",
+        "mas_informacion": "Pueden ser causadas por roces, calor, enfermedades de la piel, etc. Son más comunes en las manos y en los pies.",
+        "url": "https://medlineplus.gov/spanish/blisters.html",
+        "caracteristicas_clave": "Algunas características clave de las ampollas son: saco o “burbuja” lleno de líquido transparente o sangre, enrojecimiento, dolor, picazón en la piel, por lo general se curan naturalmente."
     },
     "Mancha": {
-        "info_elemental": "La mancha es una lesión primaria de la piel que se presenta como un cambio de coloración sin alteración en la textura ni elevación.",
-        "mas_informacion": "Las manchas pueden ser causadas por hiperpigmentación, hipopigmentación o enfermedades subyacentes.",
-        "url": "https://es.wikipedia.org/wiki/Mancha_(medicina)",
-        "caracteristicas_clave": "Se presenta como un cambio de coloración, sin alteración en la textura ni elevación."
+        "info_elemental": "La mancha es una lesión primaria de la piel que se presenta como un cambio de coloración sin alteración en la textura ni elevación. La piel moteada o veteada se debe a cambios vasculares en la piel que ocasionan un aspecto manchado. También se les conoce como discromía o piel moteada.",
+        "mas_informacion": "Algunas de las causas de las manchas son: cambios en la melanina, proliferación de bacterias u otros microorganismos en la piel, cambios en los vasos sanguíneos, inflamación debido ciertas a erupciones cutáneas, etc.",
+        "url": "https://medlineplus.gov/spanish/ency/article/003224.htm",
+        "caracteristicas_clave": "Algunas características clave de las manchas son: el color de la piel es irregular con zonas más claras o más oscuras, se presenta como un cambio de coloración, sin alteración en la textura ni elevación, puede variar su tamaño, indoloras."
     },
     "Pústula": {
-        "info_elemental": "La pústula es una lesión primaria de la piel que consiste en una pequeña elevación circunscrita llena de pus.",
-        "mas_informacion": "Las pústulas suelen estar asociadas con infecciones bacterianas o acné.",
-        "url": "https://es.wikipedia.org/wiki/P%C3%BAstula",
-        "caracteristicas_clave": "Consiste en una pequeña elevación circunscrita llena de pus."
+        "info_elemental": "La pústula es una lesión primaria de la piel que consiste en una pequeña elevación circunscrita llena de pus. Son llagas pequeñas, inflamadas en la superficie de la piel. Se parecen a las ampollas (lesiones). Pueden aparecer en cualquier parte del cuerpo, sin embargo, son más comunes en la espalda, la cara, sobre el esternón, los hombros y áreas que presentan sudoración (como las axilas o la ingle).",
+        "mas_informacion": "Pueden ser signo de una infección o en algunos casos solo están asociadas a la inflamación de la piel o por la toma de medicamentos.",
+        "url": "https://medlineplus.gov/spanish/ency/article/003234.htm",
+        "caracteristicas_clave": "Se caracterizan por ser una lesión sobre la piel llena de pus, pequeñas áreas elevadas y enrojecidas, generalmente con un centro blanquecino, pueden aparecer aisladas o en grupos, pueden encontrarse en un área del cuerpo o esparcidas por todo el cuerpo."
     },
     "Roncha": {
-        "info_elemental": "La roncha es una lesión primaria de la piel que se caracteriza por una elevación transitoria, de bordes definidos, generalmente acompañada de picazón.",
-        "mas_informacion": "Las ronchas suelen ser causadas por reacciones alérgicas o picaduras de insectos.",
-        "url": "https://es.wikipedia.org/wiki/Urticaria",
-        "caracteristicas_clave": "Se caracteriza por una elevación transitoria, de bordes definidos y generalmente acompañada de picazón."
+        "info_elemental": "La roncha es una lesión primaria de la piel que se caracteriza por una elevación transitoria, de bordes definidos, color rojizo, generalmente acompañada de picazón.",
+        "mas_informacion": "Puede aparecer como una reacción alérgica a algún alimento o medicamento, por la picadura de un insecto, infecciones, entre otras causas. También se le conoce como urticaria.",
+        "url": "https://medlineplus.gov/spanish/ency/article/000845.htm",
+        "caracteristicas_clave": "Las características clave de las ronchas son: elevación transitoria en la piel, bordes definidos, color rojizo, generalmente causan picazón y es inusual que duren más de 48 horas. Asimismo, se pueden agrandar, diseminar y unir, formando zonas más grandes de piel plana y elevada."
     }
 }
