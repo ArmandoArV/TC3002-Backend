@@ -9,7 +9,7 @@ from src.Database.mongo_connection import MongoConnection
 import unicodedata
 
 class InferenceController:
-    def __init__(self, model_filename="vgg11_15_epochs_aug_RMS.pt", device=None):
+    def __init__(self, model_filename="best_model.pt", device=None):
         """
         Initialize the inference controller.
         - Loads the model from the correct path.
@@ -48,9 +48,9 @@ class InferenceController:
         print(f"Connected to MongoDB database: {self.db.name}")
         print(f"Number of documents in collection '{collection_name}': {collection.count_documents({})}")
 
-        # Query the collection for all images
+        # Query the collection for all images, filtering out documents without the 'image' field
         related_images = collection.find({}, {"_id": 0, "image": 1})
-        images = [doc["image"] for doc in related_images]
+        images = [doc["image"] for doc in related_images if "image" in doc]
         print(f"Retrieved images: {images}")
 
         return images
@@ -65,26 +65,24 @@ class InferenceController:
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model file not found at: {model_path}")
         return model_path
-
     def load_model(self, model_path):
         """
-        Loads the VGG11 model with batch normalization and applies the trained weights.
+        Loads the ResNet50 model and applies the trained weights.
         """
-        # Use VGG11 with batch normalization
-        model = models.vgg11_bn(weights=None)  # Do not use pre-trained weights
-        model.classifier[6] = torch.nn.Linear(
-            4096, 4
-        )  # Adjust final layer to 4 classes
+        # Use ResNet50
+        model = models.resnet50(weights=None)  # Do not use pre-trained weights
+        model.fc = torch.nn.Linear(
+            model.fc.in_features, 4
+        )  # Adjust the final layer to 4 classes
 
         # Load weights with strict=False to handle mismatches
         model.load_state_dict(
-            torch.load(model_path, map_location=self.device, weights_only=True),
+            torch.load(model_path, map_location=self.device),
             strict=False,
         )
         model.to(self.device)
         model.eval()
         return model
-
     def transform_image(self, image_path):
         """
         Preprocesses an image for model inference.
@@ -108,11 +106,6 @@ class InferenceController:
         # Define a mapping of class indices to names
         class_names = {0: "Ampolla", 1: "Mancha", 2: "Pústula", 3: "Roncha"}
 
-        # Load the info.json file
-        info_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "info.json"))
-        with open(info_path, "r", encoding="utf-8") as f:
-            info_data = json.load(f)
-
         image_tensor = self.transform_image(image_path)
         with torch.no_grad():
             output = self.model(image_tensor)  # Raw model outputs (logits)
@@ -123,10 +116,14 @@ class InferenceController:
         prediction_name = class_names.get(prediction, "Unknown")
         prediction_percentage = f"{probabilities[prediction].item() * 100:.2f}%"  # Get the probability of the predicted class
 
-        # Retrieve additional information for the main prediction
-        prediction_info = info_data.get(prediction_name, {})
+        # Normalize the prediction name to use it as collection name
+        normalized_prediction_name = unicodedata.normalize('NFKD', prediction_name).encode('ASCII', 'ignore').decode('utf-8')
+        collection_name = f"{normalized_prediction_name.lower()}"
 
-        # Retrieve all related images from MongoDB
+        # Retrieve the 'info' document from MongoDB
+        info_doc = self.db[collection_name].find_one({"type": "info"}, {"_id": 0}) or {}
+
+        # Retrieve all related images
         related_images = self.get_related_images(prediction_name)
 
         # Include all predictions with their probabilities
@@ -141,11 +138,11 @@ class InferenceController:
                 {
                     "percentage": prediction_percentage,
                     "prediction": prediction_name,
-                    "info_elemental": prediction_info.get("info_elemental", ""),
-                    "caracteristicas_clave": prediction_info.get("caracteristicas_clave", ""),
-                    "mas_informacion": prediction_info.get("mas_informacion", ""),
-                    "url": prediction_info.get("url", ""),
-                    "related_images": related_images  # Add all related images
+                    "info_elemental": info_doc.get("info_elemental", ""),
+                    "caracteristicas_clave": info_doc.get("caracteristicas_clave", ""),
+                    "mas_informacion": info_doc.get("mas_informacion", ""),
+                    "url": info_doc.get("url", ""),
+                    "related_images": related_images
                 }
             ],
             "all_predictions": all_predictions
