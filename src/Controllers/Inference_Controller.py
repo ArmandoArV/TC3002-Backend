@@ -8,6 +8,9 @@ from pymongo import MongoClient  # Import MongoDB client
 from src.Database.mongo_connection import MongoConnection
 import unicodedata
 
+# Import the VGG model and related functions
+from src.Models.vgg import VGG, get_vgg_layers, vgg16_config
+
 class InferenceController:
     def __init__(self, model_filename="best_model.pt", device=None):
         """
@@ -25,8 +28,6 @@ class InferenceController:
         # Reuse the MongoDB connection
         mongo_instance = MongoConnection.get_instance()
         self.db = mongo_instance.db
-
-    import unicodedata  # Import for normalizing Unicode characters
 
     def get_related_images(self, prediction_name):
         """
@@ -54,6 +55,7 @@ class InferenceController:
         print(f"Retrieved images: {images}")
 
         return images
+
     def get_model_path(self, model_filename):
         """
         Constructs the absolute path to the model file.
@@ -65,15 +67,13 @@ class InferenceController:
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model file not found at: {model_path}")
         return model_path
+
     def load_model(self, model_path):
         """
-        Loads the ResNet50 model and applies the trained weights.
+        Loads the VGG16 model and applies the trained weights.
         """
-        # Use ResNet50
-        model = models.resnet50(weights=None)  # Do not use pre-trained weights
-        model.fc = torch.nn.Linear(
-            model.fc.in_features, 4
-        )  # Adjust the final layer to 4 classes
+        # Use VGG16
+        model = VGG(get_vgg_layers(vgg16_config, batch_norm=True), output_dim=4)  # Adjust the output dimension to 4 for your classes
 
         # Load weights with strict=False to handle mismatches
         model.load_state_dict(
@@ -83,6 +83,7 @@ class InferenceController:
         model.to(self.device)
         model.eval()
         return model
+
     def transform_image(self, image_path):
         """
         Preprocesses an image for model inference.
@@ -108,7 +109,7 @@ class InferenceController:
 
         image_tensor = self.transform_image(image_path)
         with torch.no_grad():
-            output = self.model(image_tensor)  # Raw model outputs (logits)
+            output, _ = self.model(image_tensor)  # Raw model outputs (logits)
             probabilities = F.softmax(output, dim=1).squeeze(0)  # Convert logits to probabilities and remove batch dimension
             prediction = torch.argmax(output, dim=1).item()  # Predicted class index
 
