@@ -9,7 +9,6 @@ from src.Database.mongo_connection import MongoConnection
 import unicodedata
 
 # Import the VGG model and related functions
-from src.Models.vgg import VGG, get_vgg_layers, vgg16_config
 
 class InferenceController:
     def __init__(self, model_filename="best_model.pt", device=None):
@@ -70,18 +69,23 @@ class InferenceController:
 
     def load_model(self, model_path):
         """
-        Loads the VGG16 model and applies the trained weights.
+        Loads the VGG16 model from torchvision and applies the trained weights.
         """
-        # Use VGG16
-        model = VGG(get_vgg_layers(vgg16_config, batch_norm=True), output_dim=4)  # Adjust the output dimension to 4 for your classes
+        # Load the pre-trained VGG16 model
+        model = models.vgg16(pretrained=False)
 
-        # Load weights with strict=False to handle mismatches
+        # Adjust the classifier to match the number of output classes (e.g., 4)
+        model.classifier[6] = torch.nn.Linear(in_features=4096, out_features=4)
+
+        # Load the weights from the checkpoint
         model.load_state_dict(
             torch.load(model_path, map_location=self.device),
-            strict=False,
+            strict=True,  # Ensure the architecture matches exactly
         )
+
+        # Move the model to the appropriate device
         model.to(self.device)
-        model.eval()
+        model.eval()  # Set the model to evaluation mode
         return model
 
     def transform_image(self, image_path):
